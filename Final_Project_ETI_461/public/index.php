@@ -30,39 +30,50 @@ if(array_key_exists('ADD_customer', $_POST)){
 }
 
     /*add reservation Function*/
-   function ADD_Reservation($conn){
-        $Customer_ID = $_POST['Customer_ID'];
-        $Owner_ID = $_POST['Owner_ID'];
-        $Property_ID = $_POST['Property_ID'];
-        $Total_price = $_POST['Total_price'];
-        $Dates_rerserved = $_POST['Dates_reservered'];
-        $addQuery = "INSERT INTO reservation (Customer_ID, Owner_ID, Property_ID, Total_price, Dates_reserved) 
-        VALUES" ."('$Customer_ID', '$Owner_ID', '$Property_ID', '$Total_price','$Dates_rerserved')";
-        unset($_POST);
-            $addresult = $conn->query($addQuery);
-    }
-    if(array_key_exists('ADD_Reservation', $_POST)){
-     ADD_Reservation($conn);
-    }
-
-
     /*delete function */
- function reservation_ID($conn){
-    $reservation_ID = $_POST['reservation_ID'];
-    $deleteQuery = "DELETE FROM reservation WHERE `reservation`.`Reservation_ID` = $reservation_ID";
+ function cancel_reservation($conn){
+    $res_ID = $_POST['res_ID'];
+    $deleteQuery = "DELETE FROM reservation WHERE `reservation`.`Reservation_ID` = $res_ID";
     $deleteresult = $conn->query($deleteQuery);
  }
  if(array_key_exists('reservation_ID', $_POST)){
-    reservation_ID($conn);
+    cancel_reservation($conn);
+ }
+ function Updated_Customer_Name($conn){
+    $cust_name = $_POST['cust_name'];
+    $custID = $_POST['cust_ID'];
+    if($cust_name && $custID){
+    $updatequery = "UPDATE `customer` SET `Customer_name` = '$cust_name' WHERE Customer_ID = $custID";
+    $updateresult = $conn->query($updatequery);}
+    else{
+        echo "bad call";
+    }
+ }
+ if(array_key_exists("Updated_Customer_Name", $_POST)){
+    Updated_Customer_Name($conn);
  }
  /*new customer block*/
+
+ function ADD_Reservation($conn){
+    $Customer_ID = $_POST['Customer_ID'];
+    $Owner_ID = $_POST['Owner_ID'];
+    $Property_ID = $_POST['Property_ID'];
+    $Total_price = $_POST['Total_price'];
+    $Dates_rerserved = $_POST['Dates_reservered'];
+    $addQuery = "INSERT INTO reservation (Customer_ID, Owner_ID, Property_ID, Total_price, Dates_reserved) 
+    VALUES" ."('$Customer_ID', '$Owner_ID', '$Property_ID', '$Total_price','$Dates_rerserved')";
+        $addresult = $conn->query($addQuery);
+}
+if(array_key_exists('ADD_Reservation', $_POST)){
+ ADD_Reservation($conn);
+}
 
 ?>
     <?php
     /*
     Select * PHP BLOCK
     */
-
+    
     $Selectquery = "SELECT * FROM customer";
     $Selectquery2 = "SELECT * FROM property";
     $Selectquery3 = "SELECT * FROM property_owner";
@@ -101,14 +112,14 @@ if(!$Selectresult) die("fatal error 2");
  $rows = $Selectresult2->num_rows;
  if(!$Selectresult3) die("fatal error 2");
  $rows = $Selectresult3->num_rows;
- if(!$Selectresult4) die("fatal error 2");
- $rows = $Selectresult4->num_rows;
  if(!$Selectresult5) die("fatal error 2");
  $rows = $Selectresult5->num_rows;
  if(!$joinresult) die("fatal error 2");
  $rows = $joinresult->num_rows;
  if(!$joinresult2) die("fatal error 2");
  $rows = $joinresult2->num_rows;
+ if(!$Selectresult4) die("fatal error 2");
+ $rows = $Selectresult4->num_rows;
 
 ?>
 <?php
@@ -126,10 +137,15 @@ add customer php block
     
     Customer_Name <input type="text" name = "Customer_name" placeholder="Customer_name" maxlength="15"> <br>
     Customer_address <input type="text" name = "Customer_address" placeholder="Customer_address" maxlength="15"> <br>
-    Customer_contact <input type="text" name = "Customer_Contact" placeholder="Customer_Contact" maxlength="10"> <br>
+    Customer_contact <input type="text" name = "Customer_contact" placeholder="Customer_contact" maxlength="10"> <br>
     Customer_payment <input type="text" name = "Customer_payment" placeholder="customer_payment" maxlength="15"> <br>
     Customer_Credientials <input type="text" name = "Customer_Credientials" placeholder="Customer_Credientials" maxlength="15"> <br>
     <input type="submit" name = "ADD_customer" class="button" VALUE = "ADD_customer"> <br>
+    <br>
+    <br>
+    Updated name <input type ="text" name="cust_name" placeholder="updated_name" maxlength="15"><br>
+    Customer_ID <input type ="text" name="cust_ID" placeholder=" Current Customer_ID" maxlength="15"><br>
+    <input type="submit" name = "Updated_Customer_Name" class="button" VALUE = "Updated_Customer_Name"> <br>
 
 <table>
         <tr> 
@@ -213,6 +229,8 @@ for($i = 0; $i < $rows; $i++){
             <th>Total_Price</th>
             <th>Dates_reserved</th>
         <tr>
+
+        
         <?php
 for($i = 0; $i < $rows; $i++){
                     $fullRow = $Selectresult4->fetch_array(MYSQLI_ASSOC);
@@ -232,12 +250,13 @@ Property to be reserved <input type="text" name ="Property_ID" placeholder="Prop
 Total Price <input type="text" name = "Total_price" placeholder="Total_price" maxlength="15"> <br>
 CREATE Reservation: dd/mm/yyyy-dd/mm/yyyy  <input type="text" name ="Dates_reservered" placeholder="For reservations only" maxlength="20" ><br>
 
-<input type="submit" name = "cancel_reservation" class="button" VALUE = "Cancel Reservation"> <br>
-cancel trip <input type ="text" name = "reservation_ID" placeholder=reservation_ID maxlength="5"><br>
+<input type="submit" name = "cancel_reservation" class="button" VALUE = "cancel_reservation"> <br>
+cancel trip <input type ="text" name = "res_ID" placeholder="res_ID" maxlength="5"><br>
+
 
 <table>
             <tr>
-                <h2>Recipt<h2>
+                <h2>Recipt as created with IDS<h2>
                     <th>Recipt_ID</th>
                     <th>reservation_ID</th>
                     <th>Property_ID</th>
@@ -253,7 +272,7 @@ While ($fullRow= $Selectresult5->fetch_array(MYSQLI_ASSOC)){
 
 <table>
             <tr>
-                <h2>join1<h2>
+            <h2>Finalized reservation<h2>
             <th>Reservation_ID</th>
             <th>Customer_id</th>
             <th>Owner_name</th>     
@@ -273,7 +292,7 @@ While ($fullRow= $joinresult->fetch_array(MYSQLI_ASSOC)){
 ?>
 <table>
             <tr>
-                <h2>join2<h2>
+                <h2>Finalized recipt<h2>
             <th>Recipt_ID</th>
             <th>Reservation_Date</th>
             <th>Total_Cost</th>
@@ -290,7 +309,7 @@ While ($fullRow= $joinresult->fetch_array(MYSQLI_ASSOC)){
 ?>
 <table>
         <tr> 
-        <h2>view1<h2>
+        <h2>view by State - Texas<h2>
             <th>Property_ID</th>
             <th>Owner_ID</th>
             <th>Property_Name</th>     
